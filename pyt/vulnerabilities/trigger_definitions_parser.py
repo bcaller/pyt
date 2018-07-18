@@ -16,10 +16,28 @@ Source = namedtuple('Source', ('trigger_word'))
 class Sink:
     def __init__(
         self, trigger, *,
+        args_that_propagate_taint=None, kwargs_that_propagate_taint=None,
+        args_that_dont_propagate_taint=None, kwargs_that_dont_propagate_taint=None,
         sanitisers=None
     ):
         self._trigger = trigger
         self.sanitisers = sanitisers or []
+        if args_that_propagate_taint:
+            if args_that_dont_propagate_taint:
+                raise ValueError("Sink definition specifies both an args whitelist and blacklist")
+            self._arg_list = args_that_propagate_taint
+            self._arg_list_propagates = True
+        else:
+            self._arg_list_propagates = False
+            self._arg_list = args_that_dont_propagate_taint or []
+        if kwargs_that_propagate_taint:
+            if kwargs_that_dont_propagate_taint:
+                raise ValueError("Sink definition specifies both a kwargs whitelist and blacklist")
+            self._kwarg_list = kwargs_that_propagate_taint
+            self._kwarg_list_propagates = True
+        else:
+            self._kwarg_list_propagates = False
+            self._kwarg_list = kwargs_that_dont_propagate_taint or []
 
     @property
     def call(self):
