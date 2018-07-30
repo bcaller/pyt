@@ -562,12 +562,12 @@ class ExprVisitor(StmtVisitor):
         if definition:
             if isinstance(definition.node, ast.ClassDef):
                 self.add_blackbox_or_builtin_call(node, blackbox=False)
-            elif isinstance(definition.node, ast.FunctionDef):
+            elif isinstance(definition.node, (ast.AsyncFunctionDef, ast.FunctionDef)):
                 self.undecided = False
                 self.function_return_stack.append(_id)
                 return self.process_function(node, definition)
             else:
-                raise Exception('Definition was neither FunctionDef or ' +
+                raise Exception('Definition was neither (Async)FunctionDef or ' +
                                 'ClassDef, cannot add the function ')
         elif last_attribute not in BUILTINS:
             # Mark the call as a blackbox because we don't have the definition

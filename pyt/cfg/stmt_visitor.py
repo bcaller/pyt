@@ -183,6 +183,9 @@ class StmtVisitor(ast.NodeVisitor):
 
         return IgnoredNode()
 
+    def visit_AsyncFunctionDef(self, node):
+        return self.visit_FunctionDef(node)
+
     def handle_or_else(self, orelse, test):
         """Handle the orelse part of an if or try node.
 

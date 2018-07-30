@@ -91,4 +91,4 @@ class FrameworkAdaptor():
 def _get_func_nodes():
     """Get all function nodes."""
     return [definition for definition in project_definitions.values()
-            if isinstance(definition.node, ast.FunctionDef)]
+            if isinstance(definition.node, (ast.AsyncFunctionDef, ast.FunctionDef))]
