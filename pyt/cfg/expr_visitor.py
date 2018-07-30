@@ -28,7 +28,7 @@ from ..helper_visitors import (
     RHSVisitor
 )
 from .stmt_visitor import StmtVisitor
-from .stmt_visitor_helper import CALL_IDENTIFIER
+from .stmt_visitor_helper import CALL_IDENTIFIER, unwrap_await
 
 
 class ExprVisitor(StmtVisitor):
@@ -267,6 +267,7 @@ class ExprVisitor(StmtVisitor):
             # If this results in an IndexError it is invalid Python
             def_arg_temp_name = 'temp_' + str(saved_function_call_index) + '_' + def_args[i]
 
+            call_arg = unwrap_await(call_arg)
             return_value_of_nested_call = None
             if isinstance(call_arg, ast.Call):
                 return_value_of_nested_call = self.visit(call_arg)
@@ -388,6 +389,9 @@ class ExprVisitor(StmtVisitor):
         return_connection_handler(the_new_nodes, exit_node)
 
         return (the_new_nodes, first_node)
+
+    def visit_Await(self, node):
+        return self.visit(node.value)
 
     def restore_saved_local_scope(
         self,

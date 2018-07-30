@@ -149,3 +149,10 @@ def get_last_statements(cfg_statements):
 def remove_breaks(last_statements):
     """Remove all break statements in last_statements."""
     return [n for n in last_statements if not isinstance(n, BreakNode)]
+
+
+def unwrap_await(node):
+    """If node is an Await, return its value. Otherwise just return the node. Useful for type comparisons."""
+    if isinstance(node, ast.Await):
+        return node.value
+    return node

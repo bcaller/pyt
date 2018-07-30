@@ -48,7 +48,8 @@ from .stmt_visitor_helper import (
     get_first_node,
     get_first_statement,
     get_last_statements,
-    remove_breaks
+    remove_breaks,
+    unwrap_await
 )
 
 
@@ -250,7 +251,7 @@ class StmtVisitor(ast.NodeVisitor):
         this_function_name = self.function_return_stack[-1]
         LHS = 'ret_' + this_function_name
 
-        if isinstance(node.value, ast.Call):
+        if isinstance(unwrap_await(node.value), ast.Call):
             return_value_of_call = self.visit(node.value)
             return_node = ReturnNode(
                 LHS + ' = ' + return_value_of_call.left_hand_side,
@@ -336,6 +337,7 @@ class StmtVisitor(ast.NodeVisitor):
         remaining_values = list(node.value.elts)  # May contain duplicates
 
         def visit(target, value):
+            value = unwrap_await(value)
             label = LabelVisitor()
             label.visit(target)
             rhs_visitor = RHSVisitor()
@@ -417,7 +419,7 @@ class StmtVisitor(ast.NodeVisitor):
         if isinstance(node.targets[0], (ast.Tuple, ast.List)):  # x,y = [1,2]
             if isinstance(node.value, (ast.Tuple, ast.List)):
                 return self.assign_tuple_target(node, rhs_visitor.result)
-            elif isinstance(node.value, ast.Call):
+            elif isinstance(unwrap_await(node.value), ast.Call):
                 call = None
                 for element in node.targets[0].elts:
                     label = LabelVisitor()
@@ -441,7 +443,7 @@ class StmtVisitor(ast.NodeVisitor):
         elif len(node.targets) > 1:                # x = y = 3
             return self.assign_multi_target(node, rhs_visitor.result)
         else:
-            if isinstance(node.value, ast.Call):   # x = call()
+            if isinstance(unwrap_await(node.value), ast.Call):   # x = call()
                 label = LabelVisitor()
                 label.visit(node.targets[0])
                 return self.assignment_call_node(label.result, node)
@@ -553,8 +555,9 @@ class StmtVisitor(ast.NodeVisitor):
             path=self.filenames[-1]
         ))
 
-        if isinstance(node.iter, ast.Call) and get_call_names_as_string(node.iter.func) in self.function_names:
-            last_node = self.visit(node.iter)
+        node_iter = unwrap_await(node.iter)
+        if isinstance(node_iter, ast.Call) and get_call_names_as_string(node_iter.func) in self.function_names:
+            last_node = self.visit(node_iter)
             last_node.connect(for_node)
 
         return self.loop_node_skeleton(for_node, node)
@@ -619,7 +622,7 @@ class StmtVisitor(ast.NodeVisitor):
         last_return_value_of_nested_call = None
 
         for arg in itertools.chain(node.args, node.keywords):
-            if isinstance(arg, ast.Call):
+            if isinstance(unwrap_await(arg), ast.Call):
                 return_value_of_nested_call = self.visit(arg)
 
                 if last_return_value_of_nested_call:
