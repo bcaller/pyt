@@ -562,6 +562,9 @@ class StmtVisitor(ast.NodeVisitor):
 
         return self.loop_node_skeleton(for_node, node)
 
+    def visit_AsyncFor(self, node):
+        return self.visit_For(node)
+
     def visit_While(self, node):
         label_visitor = LabelVisitor()
         label_visitor.visit(node.test)
@@ -694,6 +697,9 @@ class StmtVisitor(ast.NodeVisitor):
             connect_statements.last_statements,
             connect_statements.break_statements
         )
+
+    def visit_AsyncWith(self, node):
+        return self.visit_With(node)
 
     def visit_Break(self, node):
         return self.append_node(BreakNode(
