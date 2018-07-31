@@ -88,6 +88,9 @@ class VarsVisitor(ast.NodeVisitor):
         if not isinstance(node.func, ast.Name):
             self.visit(node.func)
         for arg in itertools.chain(node.args, node.keywords):
+            if isinstance(arg, ast.Await):
+                arg = arg.value
+
             if isinstance(arg, ast.Call):
                 if isinstance(arg.func, ast.Name):
                     # We can't just visit because we need to add 'ret_'
