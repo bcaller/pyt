@@ -43,7 +43,7 @@ class EngineTest(VulnerabilitiesBaseTestCase):
             cfg_list,
             UImode.NORMAL,
             default_blackbox_mapping_file,
-            default_trigger_word_file
+            [default_trigger_word_file]
         )
 
     def test_find_vulnerabilities_absolute_from_file_command_injection(self):

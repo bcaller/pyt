@@ -63,8 +63,10 @@ def _add_optional_group(parser):
     optional_group.add_argument(
         '-t', '--trigger-word-file',
         help='Input file with a list of sources and sinks',
+        action='append',
         type=str,
-        default=default_trigger_word_file
+        dest='trigger_word_files',
+        default=[default_trigger_word_file]
     )
     optional_group.add_argument(
         '-o', '--output',

@@ -1,3 +1,4 @@
+from sys import stdout
 from unittest import mock
 
 from .base_test_case import BaseTestCase
@@ -74,6 +75,19 @@ class MainTest(BaseTestCase):
         mock_json.report.assert_called_with(
             mock_find_vulnerabilities.return_value,
             mock_parse_args.return_value.output_file
+        )
+
+    @mock.patch('pyt.__main__.find_vulnerabilities')
+    @mock.patch('pyt.__main__.json')
+    def test_arg_parse_namespace(self, mock_json, mock_find_vulnerabilities):
+        mock_find_vulnerabilities.return_value = []
+        example_file = 'examples/vulnerable_code/inter_command_injection.py'
+
+        main(['--json', example_file])  # No SystemExit
+        assert mock_json.report.call_count == 1
+        mock_json.report.assert_called_with(
+            mock_find_vulnerabilities.return_value,
+            stdout
         )
 
 

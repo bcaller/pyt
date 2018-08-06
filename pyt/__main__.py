@@ -123,7 +123,7 @@ def main(command_line_args=sys.argv[1:]):  # noqa: C901
         cfg_list,
         ui_mode,
         args.blackbox_mapping_file,
-        args.trigger_word_file,
+        args.trigger_word_files,
         nosec_lines
     )
 

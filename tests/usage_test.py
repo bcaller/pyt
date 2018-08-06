@@ -27,7 +27,7 @@ class UsageTest(BaseTestCase):
 
         EXPECTED = """usage: python -m pyt [-h] [-a ADAPTOR] [-pr PROJECT_ROOT]
                      [-b BASELINE_JSON_FILE] [-j] [-m BLACKBOX_MAPPING_FILE]
-                     [-t TRIGGER_WORD_FILE] [-o OUTPUT_FILE] [--ignore-nosec]
+                     [-t TRIGGER_WORD_FILES] [-o OUTPUT_FILE] [--ignore-nosec]
                      [-r] [-x EXCLUDED_PATHS] [--dont-prepend-root]
                      [--no-local-imports] [-trim] [-i]
                      targets [targets ...]
@@ -48,7 +48,7 @@ optional arguments:
   -j, --json            Prints JSON instead of report.
   -m BLACKBOX_MAPPING_FILE, --blackbox-mapping-file BLACKBOX_MAPPING_FILE
                         Input blackbox mapping file.
-  -t TRIGGER_WORD_FILE, --trigger-word-file TRIGGER_WORD_FILE
+  -t TRIGGER_WORD_FILES, --trigger-word-file TRIGGER_WORD_FILES
                         Input file with a list of sources and sinks
   -o OUTPUT_FILE, --output OUTPUT_FILE
                         write report to filename
@@ -78,7 +78,7 @@ print arguments:
 
         EXPECTED = """usage: python -m pyt [-h] [-a ADAPTOR] [-pr PROJECT_ROOT]
                      [-b BASELINE_JSON_FILE] [-j] [-m BLACKBOX_MAPPING_FILE]
-                     [-t TRIGGER_WORD_FILE] [-o OUTPUT_FILE] [--ignore-nosec]
+                     [-t TRIGGER_WORD_FILES] [-o OUTPUT_FILE] [--ignore-nosec]
                      [-r] [-x EXCLUDED_PATHS] [--dont-prepend-root]
                      [--no-local-imports] [-trim] [-i]
                      targets [targets ...]
@@ -93,7 +93,7 @@ python -m pyt: error: the following arguments are required: targets\n"""
 
 #         EXPECTED = """usage: python -m pyt [-h] [-f FILEPATH] [-a ADAPTOR] [-pr PROJECT_ROOT]
 #                      [-b BASELINE_JSON_FILE] [-j] [-m BLACKBOX_MAPPING_FILE]
-#                      [-t TRIGGER_WORD_FILE] [-o OUTPUT_FILE] [-trim] [-i]
+#                      [-t TRIGGER_WORD_FILES] [-o OUTPUT_FILE] [-trim] [-i]
 # python -m pyt: error: argument -i/--interactive: not allowed with argument -trim/--trim-reassigned-in\n"""
 
 #         self.assertEqual(stderr.getvalue(), EXPECTED)

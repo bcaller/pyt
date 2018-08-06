@@ -18,7 +18,7 @@ class Sink:
         self, trigger, *,
         unlisted_args_propagate=True, unlisted_kwargs_propagate=True,
         arg_list=None, kwarg_list=None,
-        sanitisers=None
+        sanitisers=None, ignore=False
     ):
         self._trigger = trigger
         self.sanitisers = sanitisers or []
@@ -31,6 +31,7 @@ class Sink:
 
         self.arg_list = set(arg_list or ())
         self.kwarg_list = set(kwarg_list or ())
+        self.ignore = ignore
 
     def arg_propagates(self, index):
         in_list = index in self.arg_list
@@ -61,17 +62,21 @@ class Sink:
         return cls(trigger=key, **data)
 
 
-def parse(trigger_word_file):
-    """Parse the file for source and sink definitions.
+def parse(trigger_word_files):
+    """Parse the files in order for source and sink definitions.
 
     Returns:
        A definitions tuple with sources and sinks.
     """
-    with open(trigger_word_file) as fd:
-        triggers_dict = json.load(fd)
-    sources = [Source(s) for s in triggers_dict['sources']]
-    sinks = [
-        Sink.from_json(trigger, data)
-        for trigger, data in triggers_dict['sinks'].items()
-    ]
-    return Definitions(sources, sinks)
+    sources = set()
+    sinks = {}
+    for trigger_word_file in trigger_word_files:
+        with open(trigger_word_file) as fd:
+            triggers_dict = json.load(fd)
+        sources |= {Source(s) for s in triggers_dict['sources']}
+        sources -= {Source(s) for s in triggers_dict.get('ignore_sources', [])}
+        sinks.update({
+            trigger: Sink.from_json(trigger, data)
+            for trigger, data in triggers_dict['sinks'].items()
+        })
+    return Definitions(list(sources), [sink for sink in sinks.values() if not sink.ignore])

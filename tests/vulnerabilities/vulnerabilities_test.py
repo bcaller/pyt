@@ -28,21 +28,40 @@ from pyt.web_frameworks import (
 )
 
 
+def trigger_file(filename):
+    return os.path.join(os.getcwd(), 'pyt', 'vulnerability_definitions', filename)
+
+
 class EngineTest(VulnerabilitiesBaseTestCase):
     def test_parse(self):
         definitions = parse(
-            trigger_word_file=os.path.join(
-                os.getcwd(),
-                'pyt',
-                'vulnerability_definitions',
-                'test_triggers.pyt'
-            )
+            trigger_word_files=[trigger_file('test_triggers.pyt')]
         )
 
         self.assert_length(definitions.sources, expected_length=1)
         self.assert_length(definitions.sinks, expected_length=3)
         self.assert_length(definitions.sinks[0].sanitisers, expected_length=1)
         self.assert_length(definitions.sinks[1].sanitisers, expected_length=3)
+
+    def test_parse_multiple_trigger_files_and_merge_in_order(self):
+        definitions = parse(
+            trigger_word_files=[trigger_file('test_positions.pyt'), trigger_file('flask_trigger_words.pyt')]
+        )
+        n_sources = len(definitions.sources)
+        n_sinks = len(definitions.sinks)
+        self.assert_length(definitions.sinks, expected_length=13)
+        (execute,) = [sink for sink in definitions.sinks if sink.call == 'execute']
+        self.assertTrue(execute.all_arguments_propagate_taint)
+
+        definitions = parse(
+            trigger_word_files=[trigger_file('flask_trigger_words.pyt'), trigger_file('test_positions.pyt')]
+        )
+        self.assert_length(definitions.sources, expected_length=n_sources - 1)
+        self.assert_length(definitions.sinks, expected_length=n_sinks)
+        (execute,) = [sink for sink in definitions.sinks if sink.call == 'execute']
+        self.assertFalse(execute.all_arguments_propagate_taint)
+        self.assertTrue(execute.arg_propagates(0))
+        self.assertFalse(execute.arg_propagates(1))
 
     def test_label_contains(self):
         cfg_node = Node('label', None, line_number=None, path=None)
@@ -124,7 +143,7 @@ class EngineTest(VulnerabilitiesBaseTestCase):
             cfg_list,
             UImode.NORMAL,
             default_blackbox_mapping_file,
-            default_trigger_word_file
+            [default_trigger_word_file]
         )
 
     def test_find_vulnerabilities_assign_other_var(self):
@@ -528,17 +547,13 @@ class EngineDjangoTest(VulnerabilitiesBaseTestCase):
 
         analyse(cfg_list)
 
-        trigger_word_file = os.path.join(
-            'pyt',
-            'vulnerability_definitions',
-            'django_trigger_words.pyt'
-        )
+        trigger_word_file = trigger_file('django_trigger_words.pyt')
 
         return find_vulnerabilities(
             cfg_list,
             UImode.NORMAL,
             default_blackbox_mapping_file,
-            trigger_word_file
+            [trigger_word_file]
         )
 
     def test_django_view_param(self):
@@ -570,17 +585,13 @@ class EngineEveryTest(VulnerabilitiesBaseTestCase):
 
         analyse(cfg_list)
 
-        trigger_word_file = os.path.join(
-            'pyt',
-            'vulnerability_definitions',
-            'all_trigger_words.pyt'
-        )
+        trigger_word_file = trigger_file('all_trigger_words.pyt')
 
         return find_vulnerabilities(
             cfg_list,
             UImode.NORMAL,
             default_blackbox_mapping_file,
-            trigger_word_file
+            [trigger_word_file]
         )
 
     def test_self_is_not_tainted(self):
@@ -597,17 +608,13 @@ class EnginePositionTest(VulnerabilitiesBaseTestCase):
 
         analyse(cfg_list)
 
-        trigger_word_file = os.path.join(
-            'pyt',
-            'vulnerability_definitions',
-            'test_positions.pyt'
-        )
+        trigger_word_file = trigger_file('test_positions.pyt')
 
         return find_vulnerabilities(
             cfg_list,
             UImode.NORMAL,
             default_blackbox_mapping_file,
-            trigger_word_file
+            [trigger_word_file]
         )
 
     def test_sql_result_ignores_false_positive_prepared_statement(self):

@@ -510,7 +510,7 @@ def find_vulnerabilities(
     cfg_list,
     ui_mode,
     blackbox_mapping_file,
-    sources_and_sinks_file,
+    sources_and_sinks_files,
     nosec_lines=defaultdict(set)
 ):
     """Find vulnerabilities in a list of CFGs from a trigger_word_file.
@@ -519,14 +519,14 @@ def find_vulnerabilities(
         cfg_list(list[CFG]): the list of CFGs to scan.
         ui_mode(UImode): determines if we interact with the user or trim the nodes in the output, if at all.
         blackbox_mapping_file(str)
-        sources_and_sinks_file(str)
+        sources_and_sinks_files(list[str])
         nosec_lines(dict): filenames mapped to their nosec lines
 
     Returns:
         A list of vulnerabilities.
     """
     vulnerabilities = list()
-    definitions = parse(sources_and_sinks_file)
+    definitions = parse(sources_and_sinks_files)
 
     with open(blackbox_mapping_file) as infile:
         blackbox_mapping = json.load(infile)
