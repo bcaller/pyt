@@ -23,6 +23,34 @@ If you love PyT, please star our project on GitHub to show your support! :star:
 [@xxxx]: https://github.com/xxxx
 -->
 
+# Unreleased (python-taint-smk at https://github.com/bcaller/pyt)
+
+##### 0.39.2
+
+* Fix crash on encountering recursive function calls
+* Logging with -v -vv -vvv flags
+* Screen output
+
+##### 0.39.1
+
+* Chained function calls separated into multiple assignments
+
+# 0.39
+##### August 22nd, 2018
+
+##### 0.38.4
+
+* Taint propagates from methods of tainted objects (e.g. `str(TAINT.lower)`)
+
+##### 0.38.3
+* Files are now processed in a deterministic order
+
+##### 0.38.2
+* Fix for `Assignment not properly handled` on `x, y = z`
+
+##### 0.38.1
+* Fix for RuntimeError with curried function calls like `f(g(a)(b)(c))`
+
 # 0.38
 ##### August 2nd, 2018
 
